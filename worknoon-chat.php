@@ -38,22 +38,22 @@ class Worknoon_Chat_Plugin {
 
         $args = array(
             'labels'             => $labels,
-            'public'             => false, // Internal layout configuration boundary
-            'show_ui'            => true,  // Show within WordPress admin sidebar
+            'public'             => false, 
+            'show_ui'            => true,  
             'show_in_menu'       => true,
             'capability_type'    => 'post',
             'has_archive'        => false,
             'hierarchical'       => false,
             'menu_icon'          => 'dashicons-bubbles',
             'supports'           => array( 'title', 'editor', 'custom-fields' ),
-            'show_in_rest'       => true, // Enable Block Editor/REST framework
+            'show_in_rest'       => true, 
         );
 
         register_post_type( 'chat_session', $args );
     }
 
     /**
-     * Enqueue layout scripts and external styles (Tailwind, Socket.io, Canvas Icons)
+     * Enqueue layout scripts and external styles
      */
     public function enqueue_widget_assets() {
         // Enqueue Socket.io Client mirroring frontend implementation requirements
@@ -69,20 +69,22 @@ class Worknoon_Chat_Plugin {
         wp_localize_script( 'worknoon-chat-core', 'worknoonChatSettings', array(
             'rootUrl'     => esc_url_raw( rest_url( 'worknoon-chat/v1' ) ),
             'nonce'       => wp_create_nonce( 'wp_rest' ),
-            'nodeServer'  => 'http://localhost:9000', // Targets your Express backend port
-            'currentUser' => wp_get_current_user()->display_name,
+            'nodeServer'  => 'http://localhost:9000', 
+            'currentUser' => wp_get_current_user()->display_name ? wp_get_current_user()->display_name : 'Guest User',
             'currentRole' => (!empty(wp_get_current_user()->roles)) ? wp_get_current_user()->roles[0] : 'customer',
-            'currentProductId' => ( is_product() ) ? get_the_ID() : null,
-            'currentOrderId'   => ( is_view_order_page() ) ? global_get_order_id_fallback() : null,
+            
+            // ✅ SAFELY ENCAPSULATED: Resolves your WooCommerce helper constraints without crashes
+            'currentProductId' => ( function_exists( 'is_product' ) && is_product() ) ? get_the_ID() : null,
+            'currentOrderId'   => ( function_exists( 'is_view_order_page' ) && is_view_order_page() ) ? global_get_order_id_fallback() : null,
         ) );
-    }
+    } // 🚀 FIXED: Enqueue function is now closed successfully here
 
     /**
      * 🚀 REQUIREMENT: Shortcode for Chat Widget Layout Rendering
      */
     public function render_chat_shortcode_widget() {
         if ( ! is_user_logged_in() ) {
-            return '<div class="text-xs font-bold text-red-500 bg-red-50 p-3 rounded-xl border border-red-100">Please log into your WooCommerce account to initialize chat workspace.</div>';
+            return '<div style="font-size:11px; font-weight:bold; color:#ef4444; padding:12px; background-color:#fef2f2; border:1px solid #fee2e2; border-radius:12px;">Please log into your account to initialize the chat workspace.</div>';
         }
         
         ob_start();

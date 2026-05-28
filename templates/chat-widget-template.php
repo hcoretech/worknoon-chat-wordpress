@@ -22,8 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
     <div class="p-4 bg-black text-white flex items-center justify-between shrink-0">
         <div>
             <h3 class="text-xs font-black tracking-tight">Worknoon Terminal Desk</h3>
-            <!-- 🚀 BONUS FEATURE: Automated WooCommerce Product/Order Context Indicators -->
-            <?php if ( is_product() ) : ?>
+            
+            <!-- 🚀 FIXED SAFELY: Wrapped in a function_exists check to clear line 34 fatal crashes completely -->
+            <?php if ( function_exists( 'is_product' ) && is_product() ) : ?>
                 <p class="text-[9px] text-amber-300 font-bold mt-0.5">🛒 Product Sync: #<?php echo get_the_ID(); ?></p>
             <?php endif; ?>
         </div>

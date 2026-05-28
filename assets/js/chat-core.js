@@ -1,17 +1,14 @@
-/**
- * 📁 File: assets/js/chat-core.js
- * Real-Time Socket.IO Pipeline Bridge with typing triggers & read updates
- */
+
 jQuery(document).ready(function($) {
     if (typeof worknoonChatSettings === 'undefined') return;
 
     const settings = worknoonChatSettings;
     let socket = null;
-    let currentConversationId = 'wp_sync_room_global'; // Room fallback token anchor
+    let currentConversationId = 'wp_sync_room_global'; 
     let isTyping = false;
     let typingTimeout = null;
 
-    // Open/Close toggle visibility bindings
+
     $('#worknoon-chat-trigger').on('click', function() {
         $('#worknoon-chat-panel').toggleClass('hidden');
         $('#worknoon-widget-badge').addClass('hidden').text('0'); // Reset unread bubble counters on look
@@ -26,7 +23,7 @@ jQuery(document).ready(function($) {
     });
 
     function initializeRealTimeSocketConnection() {
-        // Initialize socket directly targeting your Node backend port
+
         socket = io(settings.nodeServer, { transports: ['websocket'] });
 
         socket.on('connect', function() {
@@ -34,12 +31,12 @@ jQuery(document).ready(function($) {
             socket.emit('join_channel', { channelId: currentConversationId });
         });
 
-        // 🚀 REQUIREMENT: Real-Time Message Receipt Handler
+
         socket.on('receive_message', function(payload) {
             const feed = $('#worknoon-widget-feed');
             const isMe = payload.senderName === settings.currentUser;
             
-            // Format timestamps cleanly: e.g. "11:42 AM"
+
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             const chatBubble = `
@@ -52,9 +49,9 @@ jQuery(document).ready(function($) {
             `;
 
             feed.append(chatBubble);
-            feed.scrollTop(feed[0].scrollHeight); // Auto scroll down frame layout boundaries
+            feed.scrollTop(feed[0].scrollHeight); 
 
-            // Increment triggering alert badges if panel is closed
+
             if ($('#worknoon-chat-panel').hasClass('hidden')) {
                 let currentBadgeCount = parseInt($('#worknoon-widget-badge').text()) || 0;
                 $('#worknoon-widget-badge').removeClass('hidden').text(currentBadgeCount + 1);
@@ -78,7 +75,7 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Capture keystroke animations to emit typing telemetry up to Node servers
+
     $('#worknoon-widget-input').on('keypress', function() {
         if (!socket) return;
         
@@ -117,7 +114,7 @@ jQuery(document).ready(function($) {
     });
 
     function dispatchBackupPostPayloadToWordPressDatabase(payload) {
-        // Fire ajax rest background thread to save data within Custom Post Type columns
+
         $.ajax({
             url: settings.rootUrl + '/sync-session',
             method: 'POST',
